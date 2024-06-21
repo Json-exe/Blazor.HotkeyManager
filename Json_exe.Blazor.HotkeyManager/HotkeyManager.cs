@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Json_exe.Blazor.HotkeyManager;
@@ -19,10 +20,10 @@ public class HotkeyManager : IAsyncDisposable
             "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js").AsTask());
     }
 
-    public async ValueTask<string> Prompt(string message)
+    [JSInvokable]
+    public async Task OnHotkey(KeyboardEventArgs e)
     {
-        var module = await _moduleTask.Value;
-        return await module.InvokeAsync<string>("showPrompt", message);
+        
     }
 
     public async ValueTask DisposeAsync()
