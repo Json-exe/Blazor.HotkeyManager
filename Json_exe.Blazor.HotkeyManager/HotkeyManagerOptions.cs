@@ -5,7 +5,7 @@ namespace Json_exe.Blazor.HotkeyManager;
 /// <summary>
 /// The options for the HotkeyManager to configure its behaviour.
 /// </summary>
-internal record HotkeyManagerOptions
+public sealed record HotkeyManagerOptions
 {
     /// <summary>
     /// An optional container where the HotkeyManager will listen for key events.
@@ -21,7 +21,7 @@ internal record HotkeyManagerOptions
 /// <summary>
 /// Defines a hotkey that the Manager should look for.
 /// </summary>
-internal record Hotkey
+public sealed record Hotkey
 {
     /// <summary>
     /// The key you want to listen for.

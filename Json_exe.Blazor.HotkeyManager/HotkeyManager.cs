@@ -3,37 +3,50 @@ using Microsoft.JSInterop;
 
 namespace Json_exe.Blazor.HotkeyManager;
 
-// This class provides an example of how JavaScript functionality can be wrapped
-// in a .NET class for easy consumption. The associated JavaScript module is
-// loaded on demand when first needed.
-//
-// This class can be registered as scoped DI service and then injected into Blazor
-// components for use.
+public delegate Task OnHotkeyPressed(KeyboardEventArgs e);
 
 public class HotkeyManager : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
+    private IJSObjectReference? _module;
+    private readonly IJSRuntime _jsRuntime;
+    private readonly DotNetObjectReference<HotkeyManager> _objectReference;
+    public event OnHotkeyPressed? OnHotkeyPressed;
 
     public HotkeyManager(IJSRuntime jsRuntime)
     {
-        _moduleTask = new Lazy<Task<IJSObjectReference>>(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js").AsTask());
+        _jsRuntime = jsRuntime;
+        _objectReference = DotNetObjectReference.Create(this);
+    }
+
+    public async Task Initialize(HotkeyManagerOptions options)
+    {
+        if (_module is null)
+        {
+            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
+            await _module.InvokeVoidAsync("initialized", _objectReference, options);
+        }
     }
 
     [JSInvokable]
-    public async Task OnHotkey(KeyboardEventArgs e)
+    public Task OnHotkey(KeyboardEventArgs e)
     {
-        
+        InvokeOnHotkeyPressed(e);
+        return Task.CompletedTask;
+    }
+
+    private void InvokeOnHotkeyPressed(KeyboardEventArgs e)
+    {
+        OnHotkeyPressed?.Invoke(e);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_moduleTask.IsValueCreated)
+        if (_module is not null)
         {
-            var module = await _moduleTask.Value;
             try
             {
-                await module.DisposeAsync();
+                await _module.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
