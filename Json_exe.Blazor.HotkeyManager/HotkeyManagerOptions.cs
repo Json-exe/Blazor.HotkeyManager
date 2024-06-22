@@ -10,7 +10,7 @@ public sealed record HotkeyManagerOptions
     /// <summary>
     /// An optional container where the HotkeyManager will listen for key events.
     /// </summary>
-    public RenderFragment? Container { get; init; } = null;
+    public ElementReference? Container { get; init; } = null;
 
     /// <summary>
     /// The hotkeys you want the HotkeyManager to listen for.

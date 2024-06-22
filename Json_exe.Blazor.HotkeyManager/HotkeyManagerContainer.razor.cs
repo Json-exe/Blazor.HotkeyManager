@@ -9,7 +9,7 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
     [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
     [Parameter] public HotkeyManagerOptions Options { get; set; } = default!;
     [Parameter] public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }
-    private ElementReference Container { get; set; }
+    private ElementReference? Container { get; set; }
 
     protected override void OnInitialized()
     {
@@ -19,7 +19,16 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        await HotkeyManager.Initialize(Options);
+        if (Container is not null)
+        {
+            var optionsWithContainer = Options with { Container = Container };
+            await HotkeyManager.Initialize(optionsWithContainer);
+        }
+        else
+        {
+            await HotkeyManager.Initialize(Options);
+        }
+        
         await base.OnParametersSetAsync();
     }
 

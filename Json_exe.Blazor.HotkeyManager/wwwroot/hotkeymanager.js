@@ -1,23 +1,30 @@
 let hotkeyManager;
-let options = new HotkeyManagerOptions();
+let options;
 
 export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
     hotkeyManager = hotkeyManagerInstance;
-    if (hotkeyManagerOptions.container === null) {
-        document.addEventListener('keydown', keyDownEvent);
-    } else {
-        hotkeyManagerOptions.container.addEventListener('keydown', keyDownEvent);
-    }
-
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
+    if (options.container === null) {
+        document.addEventListener('keydown', keyDownEvent);
+        console.log("Initialized without container...")
+    } else {
+        options.container.addEventListener('keydown', keyDownEvent);
+        console.log("Initialized with container...")
+    }
 }
 
 async function keyDownEvent(e) {
-    let hotkey = options.hotkeys.find(h => h.key === e.key && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
+    if (options.hotkeys.length <= 0) {
+        console.log("Skipping. No keys defined!")
+        return
+    }
+    let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
+    console.log("Found hotkey: ")
+    console.log(hotkey)
     if (hotkey !== undefined) {
-        if (hotkey.preventDefault) { 
-            e.preventDefault() 
-        };
+        if (hotkey.preventDefault) {
+            e.preventDefault()
+        }
         const newObj = {
             ctrlKey: e.ctrlKey,
             shiftKey: e.shiftKey,
