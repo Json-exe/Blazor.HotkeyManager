@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
@@ -44,6 +45,7 @@ public class HotkeyManager : IAsyncDisposable
     {
         if (_module is not null)
         {
+            Debugger.Log(0, "HotkeyManager","Disposing HotkeyManager");
             try
             {
                 await _module.DisposeAsync();

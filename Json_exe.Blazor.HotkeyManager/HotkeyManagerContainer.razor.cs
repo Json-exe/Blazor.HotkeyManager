@@ -7,7 +7,7 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
 {
     [Inject] private HotkeyManager HotkeyManager { get; set; } = default!;
     [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
-    [Parameter] public HotkeyManagerOptions Options { get; set; } = default!;
+    [Parameter] public HotkeyManagerOptions Options { get; set; } = new();
     [Parameter] public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }
     private ElementReference? Container { get; set; }
 
@@ -17,19 +17,21 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
         base.OnInitialized();
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Container is not null)
+        if (firstRender)
         {
-            var optionsWithContainer = Options with { Container = Container };
-            await HotkeyManager.Initialize(optionsWithContainer);
+            if (Container is not null)
+            {
+                var optionsWithContainer = Options with { Container = Container };
+                await HotkeyManager.Initialize(optionsWithContainer);
+            }
+            else
+            {
+                await HotkeyManager.Initialize(Options);
+            }
         }
-        else
-        {
-            await HotkeyManager.Initialize(Options);
-        }
-        
-        await base.OnParametersSetAsync();
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private Task HotkeyManagerOnOnHotkeyPressed(KeyboardEventArgs e)
