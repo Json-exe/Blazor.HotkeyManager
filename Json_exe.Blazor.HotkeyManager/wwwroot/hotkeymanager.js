@@ -6,21 +6,16 @@ export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
     if (options.container === null) {
         document.addEventListener('keydown', keyDownEvent);
-        console.log("Initialized without container...")
     } else {
         options.container.addEventListener('keydown', keyDownEvent);
-        console.log("Initialized with container...")
     }
 }
 
 async function keyDownEvent(e) {
     if (options.hotkeys.length <= 0) {
-        console.log("Skipping. No keys defined!")
         return
     }
     let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
-    console.log("Found hotkey: ")
-    console.log(hotkey)
     if (hotkey !== undefined) {
         if (hotkey.preventDefault) {
             e.preventDefault()

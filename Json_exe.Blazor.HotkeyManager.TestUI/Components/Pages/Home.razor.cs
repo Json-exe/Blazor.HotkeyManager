@@ -2,7 +2,7 @@
 
 namespace Json_exe.Blazor.HotkeyManager.TestUI.Components.Pages;
 
-public partial class Home : ComponentBase
+public partial class Home : ComponentBase, IAsyncDisposable
 {
     [Inject] private HotkeyManager HotkeyManager { get; set; } = default!;
 
@@ -30,5 +30,10 @@ public partial class Home : ComponentBase
             });
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await HotkeyManager.DisposeAsync();
     }
 }
