@@ -45,7 +45,6 @@ public class HotkeyManager : IAsyncDisposable
     {
         if (_module is not null)
         {
-            Debugger.Log(0, "HotkeyManager","Disposing HotkeyManager");
             try
             {
                 await _module.DisposeAsync();
