@@ -12,8 +12,8 @@ public partial class Home : ComponentBase, IAsyncDisposable
         {
             await HotkeyManager.Initialize(new HotkeyManagerOptions
             {
-                Hotkeys = new []
-                {
+                Hotkeys =
+                [
                     new Hotkey
                     {
                         Key = "S",
@@ -26,7 +26,7 @@ public partial class Home : ComponentBase, IAsyncDisposable
                         CtrlKey = true,
                         PreventDefault = true
                     }
-                }
+                ]
             });
         }
         await base.OnAfterRenderAsync(firstRender);

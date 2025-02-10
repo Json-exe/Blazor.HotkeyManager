@@ -47,6 +47,7 @@ public class HotkeyManager : IAsyncDisposable
         {
             try
             {
+                await _module.InvokeVoidAsync("dispose");
                 await _module.DisposeAsync();
             }
             catch (JSDisconnectedException)
