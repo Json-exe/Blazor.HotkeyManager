@@ -1,8 +1,8 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json_exe.Blazor.HotkeyManager", "Json_exe.Blazor.HotkeyManager\Json_exe.Blazor.HotkeyManager.csproj", "{C06D51CD-7EBB-48E6-AEFE-352AF7AEAC7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Json_exe.Blazor.HotkeyManager", "Json_exe.Blazor.HotkeyManager\Json_exe.Blazor.HotkeyManager.csproj", "{C06D51CD-7EBB-48E6-AEFE-352AF7AEAC7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json_exe.Blazor.HotkeyManager.TestUI", "Json_exe.Blazor.HotkeyManager.TestUI\Json_exe.Blazor.HotkeyManager.TestUI.csproj", "{0FA27C31-F08C-48D3-8D58-B3AE6BA2B29B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Json_exe.Blazor.HotkeyManager.TestUI", "Json_exe.Blazor.HotkeyManager.TestUI\Json_exe.Blazor.HotkeyManager.TestUI.csproj", "{0FA27C31-F08C-48D3-8D58-B3AE6BA2B29B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
