@@ -12,7 +12,6 @@ let options;
 export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
     hotkeyManager = hotkeyManagerInstance;
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
-    console.log("HotkeyManager initialized");
     if (options.container === null) {
         document.addEventListener('keydown', keyDownEvent);
     }
@@ -22,7 +21,6 @@ export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
 }
 export function dispose() {
     hotkeyManager = null;
-    console.log("HotkeyManager disposed");
     if (options.container === null) {
         document.removeEventListener('keydown', keyDownEvent);
     }
@@ -38,7 +36,6 @@ function keyDownEvent(e) {
         }
         let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
         if (hotkey !== undefined) {
-            console.log("Hotkey pressed: " + hotkey.key);
             if (hotkey.preventDefault) {
                 e.preventDefault();
             }
