@@ -3,20 +3,42 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace Json_exe.Blazor.HotkeyManager;
 
-public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
+/// <summary>
+/// A container for the <see cref="HotkeyManager"/> that initializes the HotkeyManager and
+/// only apply hotkeys inside the container.
+/// </summary>
+public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
 {
-    [Inject] private HotkeyManager HotkeyManager { get; set; } = default!;
-    [Parameter, EditorRequired] public RenderFragment ChildContent { get; set; } = default!;
-    [Parameter] public HotkeyManagerOptions Options { get; set; } = new();
-    [Parameter] public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }
+    [Inject] private HotkeyManager HotkeyManager { get; set; } = null!;
+
+    /// <summary>
+    /// The child content to be rendered.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    /// <summary>
+    /// The options to be used by the <see cref="HotkeyManager"/>.
+    /// </summary>
+    [Parameter]
+    public HotkeyManagerOptions Options { get; set; } = new();
+
+    /// <summary>
+    /// The event that is triggered when a hotkey is pressed.
+    /// </summary>
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }
+
     private ElementReference? Container { get; set; }
 
+    /// <inheritdoc />
     protected override void OnInitialized()
     {
         HotkeyManager.OnHotkeyPressed += HotkeyManagerOnOnHotkeyPressed;
         base.OnInitialized();
     }
 
+    /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -31,6 +53,7 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
                 await HotkeyManager.Initialize(Options);
             }
         }
+
         await base.OnAfterRenderAsync(firstRender);
     }
 
@@ -39,6 +62,7 @@ public partial class HotkeyManagerContainer : ComponentBase, IAsyncDisposable
         return OnHotkeyPressed.InvokeAsync(e);
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         HotkeyManager.OnHotkeyPressed -= HotkeyManagerOnOnHotkeyPressed;
