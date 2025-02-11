@@ -44,6 +44,50 @@ dotnet restore
 dotnet build
 ```
 
+## How to use?
+1. Register the HotkeyManager on your Service provider:
+```csharp
+builder.Services.AddHotkeyManager();
+```
+
+2. To globally use the HotkeyManager in your program or on a whole page/layout, inject the HotkeyManager in your component:
+```csharp
+[Inject] private HotkeyManager HotkeyManager {get; init;}
+```
+
+3. In the OnAfterRender (or any other lifecycle method you like, that supports JSInterop), Initialize the HotkeyManager with your options like this:
+```csharp
+ await HotkeyManager.Initialize(new HotkeyManagerOptions
+            {
+                Hotkeys =
+                [
+                    new Hotkey
+                    {
+                        Key = "S",
+                        CtrlKey = true,
+                        PreventDefault = true
+                    },
+                    new Hotkey
+                    {
+                        Key = "F",
+                        CtrlKey = true,
+                        PreventDefault = true
+                    }
+                ]
+            });
+```
+
+4. Register on the OnHotkeyPressed event of the HotkeyManager to recieve hotkey events:
+```csharp
+HotkeyManager.OnHotkeyPressed += OnHotkeyManagerOnHotkeyPressed;
+```
+
+### Attention: Dont forget to Dispose the HotkeyManager and deregister afterwards when you are finished using it! Else it will lead to unexpected behaviour like your Hotkeys being triggered on another component.
+```csharp
+HotkeyManager.OnHotkeyPressed -= OnHotkeyManagerOnHotkeyPressed;
+await HotkeyManager.DisposeAsync();
+```
+
 ## Contributing
 I welcome contributions from the community! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request. Let's make Blazor Hotkey Manager better together!
 
