@@ -16,7 +16,7 @@ public sealed record HotkeyManagerOptions
     /// The hotkeys you want the HotkeyManager to listen for.
     /// </summary>
     public IReadOnlyList<Hotkey> Hotkeys { get; init; } = [];
-};
+}
 
 /// <summary>
 /// Defines a hotkey that the Manager should look for.

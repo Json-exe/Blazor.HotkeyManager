@@ -26,7 +26,7 @@ async function keyDownEvent(e: KeyboardEvent) {
     if (options.hotkeys.length <= 0) {
         return
     }
-    let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
+    let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
     if (hotkey !== undefined) {
         if (hotkey.preventDefault) {
             e.preventDefault()
