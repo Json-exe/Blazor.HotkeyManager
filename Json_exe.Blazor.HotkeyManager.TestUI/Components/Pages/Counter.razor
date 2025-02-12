@@ -5,16 +5,30 @@
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p role="status">Current count: @_currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+<HotkeyManagerContainer Style="height: 200px;" Options="@_hotkeyManagerOptions" OnHotkeyPressed="@IncrementCount">
+    <ChildContent>
+        <div>
+            <h3>This text is inside a HotkeyManager container.</h3>
+            <br/>
+            <h4>Hotkeys will only work here and not outer scope!</h4>
+            <br/>
+            <h4>Try pressing: CTRL + U | If you need focus inside this container press the button below.</h4>
+            <button>Im here to help you focus!</button>
+        </div>
+    </ChildContent>
+</HotkeyManagerContainer>
+
 @code {
-    private int currentCount = 0;
+    private int _currentCount;
 
     private void IncrementCount()
     {
-        currentCount++;
+        _currentCount++;
+        InvokeAsync(StateHasChanged);
     }
 
 }

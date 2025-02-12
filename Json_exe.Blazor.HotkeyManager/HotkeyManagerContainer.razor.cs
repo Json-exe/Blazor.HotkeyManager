@@ -12,6 +12,16 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     [Inject] private HotkeyManager HotkeyManager { get; set; } = null!;
 
     /// <summary>
+    /// Additional classes you want to apply to the container wrapping your child content.
+    /// </summary>
+    [Parameter] public string Class { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Additional styles you want to apply to the container wrapping your child content.
+    /// </summary>
+    [Parameter] public string Style { get; set; } = string.Empty;
+
+    /// <summary>
     /// The child content to be rendered.
     /// </summary>
     [Parameter, EditorRequired]
