@@ -35,7 +35,7 @@ function keyDownEvent(e) {
             return;
         }
         let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
-        if (hotkey !== undefined) {
+        if (hotkey) {
             if (hotkey.preventDefault) {
                 e.preventDefault();
             }
@@ -49,7 +49,7 @@ function keyDownEvent(e) {
                 location: e.location,
                 type: e.type
             };
-            yield hotkeyManager.invokeMethodAsync('OnHotkey', newObj);
+            yield hotkeyManager.invokeMethodAsync('OnHotkey', newObj, hotkey.id);
         }
     });
 }
@@ -60,7 +60,8 @@ class HotkeyManagerOptions {
     }
 }
 class Hotkey {
-    constructor(key, ctrlKey = false, shiftKey = false, preventDefault = false) {
+    constructor(id, key, ctrlKey = false, shiftKey = false, preventDefault = false) {
+        this.id = id;
         this.key = key;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;

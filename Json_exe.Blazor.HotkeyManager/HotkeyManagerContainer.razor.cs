@@ -14,12 +14,14 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     /// <summary>
     /// Additional classes you want to apply to the container wrapping your child content.
     /// </summary>
-    [Parameter] public string Class { get; set; } = string.Empty;
-    
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
     /// <summary>
     /// Additional styles you want to apply to the container wrapping your child content.
     /// </summary>
-    [Parameter] public string Style { get; set; } = string.Empty;
+    [Parameter]
+    public string Style { get; set; } = string.Empty;
 
     /// <summary>
     /// The child content to be rendered.
@@ -34,7 +36,8 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     public HotkeyManagerOptions Options { get; set; } = new();
 
     /// <summary>
-    /// The event that is triggered when a hotkey is pressed.
+    /// The event that is triggered when any hotkey is pressed providing the <see cref="KeyboardEventArgs"/> when
+    /// this hotkey was pressed.
     /// </summary>
     [Parameter]
     public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }

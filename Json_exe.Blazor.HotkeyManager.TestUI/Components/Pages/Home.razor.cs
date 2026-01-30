@@ -6,9 +6,10 @@ namespace Json_exe.Blazor.HotkeyManager.TestUI.Components.Pages;
 public partial class Home : ComponentBase, IAsyncDisposable
 {
     [Inject] private HotkeyManager HotkeyManager { get; set; } = null!;
-    private string? _hotkeyPressed;
+    private string _hotkeyPressed = string.Empty;
     private bool _ctrlKey;
     private bool _shiftKey;
+    private string _hotkeyMessage = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -22,13 +23,15 @@ public partial class Home : ComponentBase, IAsyncDisposable
                     {
                         Key = "S",
                         CtrlKey = true,
-                        PreventDefault = true
+                        PreventDefault = true,
+                        OnHotkeyTriggered = OnHotkeySCTRLTriggered
                     },
                     new Hotkey
                     {
                         Key = "F",
                         CtrlKey = true,
-                        PreventDefault = true
+                        PreventDefault = true,
+                        OnHotkeyTriggeredAsync = OnHotkeyTriggeredAsync
                     },
                     new Hotkey
                     {
@@ -42,6 +45,18 @@ public partial class Home : ComponentBase, IAsyncDisposable
         }
 
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private Task OnHotkeyTriggeredAsync()
+    {
+        _hotkeyMessage = "Hello from the F + CTRL hotkey! This was run ASYNC!";
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private void OnHotkeySCTRLTriggered()
+    {
+        _hotkeyMessage = "Hello from the S + CTRL hotkey!";
+        InvokeAsync(StateHasChanged);
     }
 
     private Task HotkeyManagerOnOnHotkeyPressed(KeyboardEventArgs e)

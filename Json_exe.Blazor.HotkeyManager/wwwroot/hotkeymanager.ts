@@ -41,7 +41,7 @@ async function keyDownEvent(e: KeyboardEvent) {
             location: e.location,
             type: e.type
         }
-        await hotkeyManager.invokeMethodAsync('OnHotkey', newObj);
+        await hotkeyManager.invokeMethodAsync('OnHotkey', newObj, hotkey.id);
     }
 }
 
@@ -56,12 +56,14 @@ class HotkeyManagerOptions {
 }
 
 class Hotkey {
+    public id: string /* Guid */;
     public key: string;
     public ctrlKey: boolean;
     public shiftKey: boolean;
     public preventDefault: boolean;
 
-    constructor(key: string, ctrlKey = false, shiftKey = false, preventDefault = false) {
+    constructor(id: string /* Guid */, key: string, ctrlKey = false, shiftKey = false, preventDefault = false) {
+        this.id = id;
         this.key = key;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;
