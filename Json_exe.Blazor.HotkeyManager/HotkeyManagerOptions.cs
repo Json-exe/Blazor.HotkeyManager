@@ -42,7 +42,8 @@ public sealed record Hotkey
     public bool ShiftKey { get; init; }
 
     /// <summary>
-    /// True if you want to prevent the default behavior of the key.
+    /// True if you want to prevent the default behavior of the key from the browser.
+    /// <remarks>Defaults to true.</remarks>
     /// </summary>
     public bool PreventDefault { get; init; } = true;
 
@@ -59,6 +60,6 @@ public sealed record Hotkey
     internal Task TriggerHotkeyEvent()
     {
         OnHotkeyTriggered?.Invoke();
-        return OnHotkeyTriggeredAsync is not null ? OnHotkeyTriggeredAsync.Invoke() : Task.CompletedTask;
+        return OnHotkeyTriggeredAsync?.Invoke() ?? Task.CompletedTask;
     }
 }

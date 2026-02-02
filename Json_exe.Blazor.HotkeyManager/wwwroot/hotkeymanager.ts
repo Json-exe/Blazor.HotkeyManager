@@ -22,6 +22,7 @@ export function dispose() {
     options = null;
 }
 
+// TODO: What about multiple keys? Like S + F and/or with a modifier?
 async function keyDownEvent(e: KeyboardEvent) {
     if (options.hotkeys.length <= 0) {
         return
