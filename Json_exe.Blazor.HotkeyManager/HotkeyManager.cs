@@ -36,14 +36,16 @@ public sealed class HotkeyManager : IAsyncDisposable
     }
 
     /// <summary>
-    /// Initializes the HotkeyManager with the given options.
+    /// Initializes or updates the HotkeyManager with the given options.
     /// </summary>
-    /// <param name="options"></param>
+    /// <remarks>
+    /// Make sure to call this method inside a lifecycle method that supports JS Interop.
+    /// </remarks>
+    /// <param name="options">
+    /// The options to initialize the HotkeyManager with.
+    /// </param>
     public async Task Initialize(HotkeyManagerOptions options)
     {
-        if (_loadedOptions is not null)
-            throw new InvalidOperationException("This HotkeyManager instance has already been initialized!");
-
         _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
         await _module.InvokeVoidAsync("initialize", _objectReference, options);

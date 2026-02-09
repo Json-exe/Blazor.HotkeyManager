@@ -2,6 +2,7 @@ let hotkeyManager;
 let options: HotkeyManagerOptions;
 
 export function initialize(hotkeyManagerInstance, hotkeyManagerOptions: HotkeyManagerOptions) {
+    dispose();
     hotkeyManager = hotkeyManagerInstance;
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
     if (options.container === null) {
@@ -11,6 +12,7 @@ export function initialize(hotkeyManagerInstance, hotkeyManagerOptions: HotkeyMa
     }
 }
 
+// TODO: https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-10.0#dom-cleanup-tasks-during-component-disposal
 export function dispose() {
     hotkeyManager = null;
     if (options.container) {
