@@ -47,8 +47,8 @@ else
 
     private readonly HotkeyManagerOptions _options = new()
     {
-        Hotkeys = new []
-        {
+        Hotkeys =
+        [
             new Hotkey
             {
                 Key = "S",
@@ -61,7 +61,7 @@ else
                 CtrlKey = true,
                 PreventDefault = true
             }
-        }
+        ]
     };
 
     protected override async Task OnInitializedAsync()

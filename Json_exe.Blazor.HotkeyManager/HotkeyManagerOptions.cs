@@ -16,7 +16,7 @@ public sealed record HotkeyManagerOptions
     /// <summary>
     /// The hotkeys you want the HotkeyManager to listen for.
     /// </summary>
-    public IReadOnlyList<Hotkey> Hotkeys { get; init; } = [];
+    public HashSet<Hotkey> Hotkeys { get; init; } = [];
 }
 
 /// <summary>
@@ -42,6 +42,11 @@ public sealed record Hotkey
     public bool ShiftKey { get; init; }
 
     /// <summary>
+    /// True if you want to listen for Alt + Key
+    /// </summary>
+    public bool AltKey { get; init; }
+
+    /// <summary>
     /// True if you want to prevent the default behavior of the key from the browser.
     /// <remarks>Defaults to true.</remarks>
     /// </summary>
@@ -61,5 +66,18 @@ public sealed record Hotkey
     {
         OnHotkeyTriggered?.Invoke();
         return OnHotkeyTriggeredAsync?.Invoke() ?? Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public bool Equals(Hotkey? other)
+    {
+        if (other is null) return false;
+        return other.Key == Key && other.AltKey == AltKey && other.CtrlKey == CtrlKey && other.ShiftKey == ShiftKey;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Key, CtrlKey, ShiftKey, AltKey);
     }
 }

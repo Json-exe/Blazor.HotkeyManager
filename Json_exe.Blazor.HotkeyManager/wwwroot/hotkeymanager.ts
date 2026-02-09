@@ -22,7 +22,6 @@ export function dispose() {
     options = null;
 }
 
-// TODO: What about multiple keys? Like S + F and/or with a modifier?
 async function keyDownEvent(e: KeyboardEvent) {
     if (options.hotkeys.length <= 0) {
         return
@@ -61,13 +60,15 @@ class Hotkey {
     public key: string;
     public ctrlKey: boolean;
     public shiftKey: boolean;
+    public altKey: boolean;
     public preventDefault: boolean;
 
-    constructor(id: string /* Guid */, key: string, ctrlKey = false, shiftKey = false, preventDefault = false) {
+    constructor(id: string /* Guid */, key: string, ctrlKey = false, shiftKey = false, altKey = false, preventDefault = false) {
         this.id = id;
         this.key = key;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;
+        this.altKey = altKey;
         this.preventDefault = preventDefault;
     }
 }

@@ -38,6 +38,12 @@ public partial class Home : ComponentBase, IAsyncDisposable
                         Key = "S",
                         ShiftKey = true,
                         PreventDefault = true
+                    },
+                    new Hotkey
+                    {
+                        Key = "S",
+                        AltKey = true,
+                        PreventDefault = true
                     }
                 ]
             });
