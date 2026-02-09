@@ -8,6 +8,7 @@ public partial class Home : ComponentBase, IAsyncDisposable
     [Inject] private HotkeyManager HotkeyManager { get; set; } = null!;
     private string _hotkeyPressed = string.Empty;
     private bool _ctrlKey;
+    private bool _altKey;
     private bool _shiftKey;
     private string _hotkeyMessage = string.Empty;
 
@@ -33,6 +34,13 @@ public partial class Home : ComponentBase, IAsyncDisposable
                         PreventDefault = true,
                         OnHotkeyTriggeredAsync = OnHotkeyTriggeredAsync
                     },
+                    new Hotkey
+                    {
+                        Key = "S",
+                        ShiftKey = true,
+                        PreventDefault = true
+                    },
+                    // This hotkey will be ignored cause it is a duplicate definition.
                     new Hotkey
                     {
                         Key = "S",
@@ -70,6 +78,7 @@ public partial class Home : ComponentBase, IAsyncDisposable
         _hotkeyPressed = e.Key;
         _ctrlKey = e.CtrlKey;
         _shiftKey = e.ShiftKey;
+        _altKey = e.AltKey;
         return InvokeAsync(StateHasChanged);
     }
 

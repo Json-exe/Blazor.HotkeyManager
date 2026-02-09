@@ -55,12 +55,12 @@ public sealed record Hotkey
     /// <summary>
     /// An action invoked when the associated hotkey is triggered.
     /// </summary>
-    public Action? OnHotkeyTriggered { get; init; }
+    [JsonIgnore] public Action? OnHotkeyTriggered { get; init; }
 
     /// <summary>
     /// An asynchronous function that is invoked when the associated hotkey is triggered.
     /// </summary>
-    public Func<Task>? OnHotkeyTriggeredAsync { get; init; }
+    [JsonIgnore] public Func<Task>? OnHotkeyTriggeredAsync { get; init; }
 
     internal Task TriggerHotkeyEvent()
     {

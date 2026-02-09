@@ -1,7 +1,7 @@
 let hotkeyManager;
 let options: HotkeyManagerOptions;
 
-export function initialized(hotkeyManagerInstance, hotkeyManagerOptions: HotkeyManagerOptions) {
+export function initialize(hotkeyManagerInstance, hotkeyManagerOptions: HotkeyManagerOptions) {
     hotkeyManager = hotkeyManagerInstance;
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
     if (options.container === null) {
@@ -13,10 +13,10 @@ export function initialized(hotkeyManagerInstance, hotkeyManagerOptions: HotkeyM
 
 export function dispose() {
     hotkeyManager = null;
-    if (options.container === null) {
-        document.removeEventListener('keydown', keyDownEvent);
-    } else {
+    if (options.container) {
         options.container.removeEventListener('keydown', keyDownEvent);
+    } else {
+        document.removeEventListener('keydown', keyDownEvent);
     }
 
     options = null;

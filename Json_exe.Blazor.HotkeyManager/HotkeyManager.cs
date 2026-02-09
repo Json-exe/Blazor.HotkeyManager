@@ -46,7 +46,7 @@ public sealed class HotkeyManager : IAsyncDisposable
 
         _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
-        await _module.InvokeVoidAsync("initialized", _objectReference, options);
+        await _module.InvokeVoidAsync("initialize", _objectReference, options);
         _loadedOptions = options;
     }
 

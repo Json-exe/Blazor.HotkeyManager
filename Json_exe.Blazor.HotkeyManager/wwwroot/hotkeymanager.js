@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 let hotkeyManager;
 let options;
-export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
+export function initialize(hotkeyManagerInstance, hotkeyManagerOptions) {
     hotkeyManager = hotkeyManagerInstance;
     options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
     if (options.container === null) {
@@ -19,13 +19,14 @@ export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
         options.container.addEventListener('keydown', keyDownEvent);
     }
 }
+// TODO: https://learn.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-10.0#dom-cleanup-tasks-during-component-disposal
 export function dispose() {
     hotkeyManager = null;
-    if (options.container === null) {
-        document.removeEventListener('keydown', keyDownEvent);
+    if (options.container) {
+        options.container.removeEventListener('keydown', keyDownEvent);
     }
     else {
-        options.container.removeEventListener('keydown', keyDownEvent);
+        document.removeEventListener('keydown', keyDownEvent);
     }
     options = null;
 }
@@ -35,7 +36,7 @@ function keyDownEvent(e) {
             return;
         }
         let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
-        if (hotkey) {
+        if (hotkey !== undefined) {
             if (hotkey.preventDefault) {
                 e.preventDefault();
             }
@@ -60,11 +61,12 @@ class HotkeyManagerOptions {
     }
 }
 class Hotkey {
-    constructor(id, key, ctrlKey = false, shiftKey = false, preventDefault = false) {
+    constructor(id /* Guid */, key, ctrlKey = false, shiftKey = false, altKey = false, preventDefault = false) {
         this.id = id;
         this.key = key;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;
+        this.altKey = altKey;
         this.preventDefault = preventDefault;
     }
 }
