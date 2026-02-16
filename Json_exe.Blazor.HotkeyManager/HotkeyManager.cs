@@ -16,6 +16,7 @@ public sealed class HotkeyManager : IAsyncDisposable
     private IJSObjectReference? _module;
     private readonly IJSRuntime _jsRuntime;
     private readonly DotNetObjectReference<HotkeyManager> _objectReference;
+    private IJSObjectReference? _jsHotkeyManager;
     private HotkeyManagerOptions? _loadedOptions;
 
     /// <summary>
@@ -44,11 +45,23 @@ public sealed class HotkeyManager : IAsyncDisposable
     /// <param name="options">
     /// The options to initialize the HotkeyManager with.
     /// </param>
-    public async Task Initialize(HotkeyManagerOptions options)
+    /// <param name="cancellationToken">
+    /// A cancellation token to support cancellation. Defaults to default.
+    /// </param>
+    public async Task Initialize(HotkeyManagerOptions options, CancellationToken cancellationToken = default)
     {
+        // If we already have a jsHotkeyManager instance, use the initialize method of the class to re-initialize it.
+        if (_jsHotkeyManager is not null)
+        {
+            await _jsHotkeyManager.InvokeVoidAsync("initialize", cancellationToken, options);
+            _loadedOptions = options;
+            return;
+        }
+
         _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
-        await _module.InvokeVoidAsync("initialize", _objectReference, options);
+            "import", cancellationToken, "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
+        _jsHotkeyManager =
+            await _module.InvokeConstructorAsync("HotkeyManager", cancellationToken, [_objectReference, options]);
         _loadedOptions = options;
     }
 
@@ -73,25 +86,23 @@ public sealed class HotkeyManager : IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (_module is not null)
+        try
         {
-            try
-            {
-                // TODO: Align this disposal logic with the pattern recommended in the Blazor documentation for
-                // JavaScript interop cleanup. In the official docs, a `<dispose-element>` pattern is shown as an
-                // example of how to associate JS resources with a specific DOM element so they can be released
-                // deterministically when the component is disposed. See, for example:
-                // https://learn.microsoft.com/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-10.0#dom-cleanup-tasks-during-component-disposal
-                // Evaluate whether this HotkeyManager should use a similar element-scoped disposal pattern or an
-                // equivalent mechanism, and update the JS module and this call site accordingly.
-                await _module.InvokeVoidAsync("dispose");
-                await _module.DisposeAsync();
-                _module = null;
-            }
-            catch (JSDisconnectedException)
-            {
-                // Ignore.
-            }
+            // TODO: Align this disposal logic with the pattern recommended in the Blazor documentation for
+            // JavaScript interop cleanup. In the official docs, a `<dispose-element>` pattern is shown as an
+            // example of how to associate JS resources with a specific DOM element so they can be released
+            // deterministically when the component is disposed. See, for example:
+            // https://learn.microsoft.com/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-10.0#dom-cleanup-tasks-during-component-disposal
+            // Evaluate whether this HotkeyManager should use a similar element-scoped disposal pattern or an
+            // equivalent mechanism, and update the JS module and this call site accordingly.
+            if (_jsHotkeyManager is not null) await _jsHotkeyManager.DisposeAsync();
+            if (_module is not null) await _module.DisposeAsync();
+            _jsHotkeyManager = null;
+            _module = null;
+        }
+        catch (JSDisconnectedException)
+        {
+            // Ignore.
         }
 
         _objectReference.Dispose();

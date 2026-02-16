@@ -40,6 +40,7 @@ else
             </table>
         </ChildContent>
     </HotkeyManagerContainer>
+    <button @onclick="RemoveHotkeyOption">Click to remove a option and re-initialize hotkeys!</button>
 }
 
 @code {
@@ -85,6 +86,11 @@ else
         public int TemperatureC { get; set; }
         public string? Summary { get; set; }
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+    private void RemoveHotkeyOption()
+    {
+        _options.Hotkeys.Remove(_options.Hotkeys.Last());
     }
 
 }

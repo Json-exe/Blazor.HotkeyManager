@@ -42,7 +42,9 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     [Parameter]
     public EventCallback<KeyboardEventArgs> OnHotkeyPressed { get; set; }
 
-    private ElementReference? Container { get; set; }
+    private ElementReference? _container;
+    private HotkeyManagerOptions? _loadedOptions;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     /// <inheritdoc />
     protected override void OnInitialized()
@@ -54,20 +56,17 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender && _loadedOptions?.Hotkeys == Options.Hotkeys) return;
+        if (_container is not null)
         {
-            if (Container is not null)
-            {
-                var optionsWithContainer = Options with { Container = Container };
-                await HotkeyManager.Initialize(optionsWithContainer);
-            }
-            else
-            {
-                await HotkeyManager.Initialize(Options);
-            }
+            _loadedOptions = Options with { Container = _container };
+        }
+        else
+        {
+            _loadedOptions = Options with { };
         }
 
-        await base.OnAfterRenderAsync(firstRender);
+        await HotkeyManager.Initialize(_loadedOptions, _cancellationTokenSource.Token);
     }
 
     private Task HotkeyManagerOnOnHotkeyPressed(KeyboardEventArgs e)
@@ -78,6 +77,7 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        await _cancellationTokenSource.CancelAsync();
         HotkeyManager.OnHotkeyPressed -= HotkeyManagerOnOnHotkeyPressed;
         await HotkeyManager.DisposeAsync();
     }

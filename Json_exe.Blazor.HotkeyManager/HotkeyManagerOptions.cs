@@ -17,6 +17,12 @@ public sealed record HotkeyManagerOptions
     /// The hotkeys you want the HotkeyManager to listen for.
     /// </summary>
     public HashSet<Hotkey> Hotkeys { get; init; } = [];
+
+    public HotkeyManagerOptions(HotkeyManagerOptions options)
+    {
+        Container = options.Container;
+        Hotkeys = new HashSet<Hotkey>(options.Hotkeys);
+    }
 }
 
 /// <summary>
@@ -55,12 +61,14 @@ public sealed record Hotkey
     /// <summary>
     /// An action invoked when the associated hotkey is triggered.
     /// </summary>
-    [JsonIgnore] public Action? OnHotkeyTriggered { get; init; }
+    [JsonIgnore]
+    public Action? OnHotkeyTriggered { get; init; }
 
     /// <summary>
     /// An asynchronous function that is invoked when the associated hotkey is triggered.
     /// </summary>
-    [JsonIgnore] public Func<Task>? OnHotkeyTriggeredAsync { get; init; }
+    [JsonIgnore]
+    public Func<Task>? OnHotkeyTriggeredAsync { get; init; }
 
     internal Task TriggerHotkeyEvent()
     {
