@@ -88,7 +88,6 @@ export class HotkeyManager {
     }
     dispose(disposing) {
         var _a;
-        console.log("Cleaning HotkeyManager events.");
         if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.container) {
             this.options.container.removeEventListener('keydown', this.keyDownFunction);
         }
@@ -96,7 +95,6 @@ export class HotkeyManager {
             document.removeEventListener('keydown', this.keyDownFunction);
         }
         if (disposing) {
-            console.log("Disposing HotkeyManager.");
             this.disposeElementCleanupFunction();
             this.hotkeyManager = null;
             this.options = null;
@@ -108,7 +106,10 @@ export class HotkeyManager {
             if (this.options.hotkeys.length <= 0) {
                 return;
             }
-            let hotkey = this.options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
+            let hotkey = this.options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase()
+                && h.ctrlKey === e.ctrlKey
+                && h.shiftKey === e.shiftKey
+                && h.altKey === e.altKey);
             if (hotkey !== undefined) {
                 if (hotkey.preventDefault) {
                     e.preventDefault();

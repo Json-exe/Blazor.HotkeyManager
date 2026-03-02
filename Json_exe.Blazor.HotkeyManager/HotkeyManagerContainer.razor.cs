@@ -78,6 +78,7 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     public async ValueTask DisposeAsync()
     {
         await _cancellationTokenSource.CancelAsync();
+        _cancellationTokenSource.Dispose();
         HotkeyManager.OnHotkeyPressed -= HotkeyManagerOnOnHotkeyPressed;
         await HotkeyManager.DisposeAsync();
     }

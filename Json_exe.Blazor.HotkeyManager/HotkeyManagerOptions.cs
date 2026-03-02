@@ -80,12 +80,17 @@ public sealed record Hotkey
     public bool Equals(Hotkey? other)
     {
         if (other is null) return false;
-        return other.Key == Key && other.AltKey == AltKey && other.CtrlKey == CtrlKey && other.ShiftKey == ShiftKey;
+        return other.Key.Equals(Key, StringComparison.OrdinalIgnoreCase)
+               && other.AltKey == AltKey
+               && other.CtrlKey == CtrlKey
+               && other.ShiftKey == ShiftKey
+               && other.PreventDefault == PreventDefault;
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(Key, CtrlKey, ShiftKey, AltKey);
+        var normalizedKeyHash = StringComparer.OrdinalIgnoreCase.GetHashCode(Key);
+        return HashCode.Combine(normalizedKeyHash, CtrlKey, ShiftKey, AltKey, PreventDefault);
     }
 }

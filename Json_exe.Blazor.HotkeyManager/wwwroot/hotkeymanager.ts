@@ -85,7 +85,6 @@ export class HotkeyManager {
     }
 
     private dispose(disposing: boolean) {
-        console.log("Cleaning HotkeyManager events.")
         if (this.options?.container) {
             this.options.container.removeEventListener('keydown', this.keyDownFunction);
         } else {
@@ -93,7 +92,6 @@ export class HotkeyManager {
         }
 
         if (disposing) {
-            console.log("Disposing HotkeyManager.")
             this.disposeElementCleanupFunction();
             this.hotkeyManager = null;
             this.options = null;
