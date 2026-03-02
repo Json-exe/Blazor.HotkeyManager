@@ -39,7 +39,7 @@ dotnet add package Json_exe.Blazor.HotkeyManager
 Alternatively, you can add the package reference directly to your .csproj file:
 
 ```cs
-<PackageReference Include="Json_exe.Blazor.HotkeyManager" Version="1.0.0" />
+<PackageReference Include="Json_exe.Blazor.HotkeyManager" Version="2.0.0" />
 ```
 
 ## Building Locally
@@ -99,26 +99,30 @@ await HotkeyManager.Initialize(new HotkeyManagerOptions
         {
             Key = "S",
             CtrlKey = true,
-            PreventDefault = true
+            PreventDefault = true,
+            OnHotkeyTriggered = HotkeySTriggered
         },
         new Hotkey
         {
             Key = "F",
             CtrlKey = true,
-            PreventDefault = true
+            PreventDefault = true,
+            OnHotkeyTriggeredAsync = HotkeyFTriggeredAsync
         }
     ]
 });
 ```
 
-4. Register on the OnHotkeyPressed event of the HotkeyManager to recieve hotkey events:
+4. Register on the OnHotkeyPressed event of the HotkeyManager to receive hotkey events (Optional):
+
+> This is only necessary if you want to listen to all incoming Hotkey events.
 
 ```csharp
 HotkeyManager.OnHotkeyPressed += OnHotkeyManagerOnHotkeyPressed;
 ```
 
-> Attention: Don't forget to Dispose the HotkeyManager and deregister afterwards when you are finished using it! Else it
-> will lead to unexpected behaviour like your Hotkeys being triggered on another component.
+> Attention: Remember to Dispose the HotkeyManager and deregister afterward when you are finished using it! Else it
+> will lead to unexpected behavior like your Hotkeys being triggered on another component.
 
 ```csharp
 HotkeyManager.OnHotkeyPressed -= OnHotkeyManagerOnHotkeyPressed;
