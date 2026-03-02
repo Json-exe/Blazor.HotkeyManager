@@ -105,7 +105,12 @@ export class HotkeyManager {
         if (this.options.hotkeys.length <= 0) {
             return
         }
-        let hotkey = this.options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
+        let hotkey = this.options.hotkeys.find(h =>
+            h.key.toLowerCase() === e.key.toLowerCase()
+            && h.ctrlKey === e.ctrlKey
+            && h.shiftKey === e.shiftKey
+            && h.altKey === e.altKey
+        );
         if (hotkey !== undefined) {
             if (hotkey.preventDefault) {
                 e.preventDefault()
