@@ -74,7 +74,7 @@ public sealed class HotkeyManager : IAsyncDisposable
     public async ValueTask OnHotkey(KeyboardEventArgs e, Guid hotkeyId)
     {
         InvokeOnHotkeyPressed(e);
-        var task = _loadedOptions?.Hotkeys.First(h => h.Id == hotkeyId).TriggerHotkeyEvent();
+        var task = _loadedOptions?.Hotkeys.FirstOrDefault(h => h.Id == hotkeyId)?.TriggerHotkeyEvent();
         if (task is not null) await task;
     }
 
