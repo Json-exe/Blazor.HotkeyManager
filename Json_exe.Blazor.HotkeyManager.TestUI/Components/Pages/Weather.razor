@@ -40,7 +40,7 @@ else
             </table>
         </ChildContent>
     </HotkeyManagerContainer>
-    <button @onclick="RemoveHotkeyOption">Click to remove a option and re-initialize hotkeys!</button>
+    <button @onclick="RemoveHotkeyOption">Click to remove an option and re-initialize hotkeys!</button>
 }
 
 @code {
@@ -90,6 +90,11 @@ else
 
     private void RemoveHotkeyOption()
     {
+        if (_options.Hotkeys.Count == 0)
+        {
+            return;
+        }
+
         _options.Hotkeys.Remove(_options.Hotkeys.Last());
     }
 

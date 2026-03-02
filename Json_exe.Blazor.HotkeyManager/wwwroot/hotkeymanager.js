@@ -12,14 +12,20 @@ class DisposeElement extends HTMLElement {
         super(...arguments);
         this.eventTarget = new EventTarget();
         this.disposed = false;
+        this.isMoving = false;
     }
     connectedCallback() {
+        this.isMoving = false;
         this.style.display = "none";
         this.style.width = "0";
         this.style.height = "0";
     }
     disconnectedCallback() {
+        if (this.isMoving)
+            return;
         this.dispose();
+    }
+    connectedMoveCallback() {
     }
     addEventListener(type, listener, options) {
         if (type !== "dispose")
@@ -57,11 +63,14 @@ export class HotkeyManager {
     }
     initialize(hotkeyManagerOptions) {
         this.tryDefineDisposeElement();
+        this.dispose(false);
         this.options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
         if (!this.disposeElement) {
             this.disposeElement = document.createElement(DisposeElement.TagName);
-            this.disposeElementCleanupFunction = this.disposeElement.onDisposed(this.dispose.bind(this));
+            this.disposeElementCleanupFunction = this.disposeElement.onDisposed(() => this.dispose(true));
         }
+        if (this.disposeElement.isConnected)
+            this.disposeElement.isMoving = true;
         if (this.options.container === null) {
             document.addEventListener('keydown', this.keyDownFunction);
             document.body.appendChild(this.disposeElement);
@@ -77,17 +86,22 @@ export class HotkeyManager {
             return;
         customElements.define(DisposeElement.TagName, DisposeElement);
     }
-    dispose() {
-        this.hotkeyManager = null;
-        if (this.options.container) {
+    dispose(disposing) {
+        var _a;
+        console.log("Cleaning HotkeyManager events.");
+        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.container) {
             this.options.container.removeEventListener('keydown', this.keyDownFunction);
         }
         else {
             document.removeEventListener('keydown', this.keyDownFunction);
         }
-        this.options = null;
-        this.disposeElementCleanupFunction();
-        this.disposeElement = null;
+        if (disposing) {
+            console.log("Disposing HotkeyManager.");
+            this.disposeElementCleanupFunction();
+            this.hotkeyManager = null;
+            this.options = null;
+            this.disposeElement = null;
+        }
     }
     keyDownEvent(e) {
         return __awaiter(this, void 0, void 0, function* () {

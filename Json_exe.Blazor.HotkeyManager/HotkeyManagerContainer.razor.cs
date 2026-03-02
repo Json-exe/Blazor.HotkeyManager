@@ -56,7 +56,7 @@ public sealed partial class HotkeyManagerContainer : ComponentBase, IAsyncDispos
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender && _loadedOptions?.Hotkeys == Options.Hotkeys) return;
+        if (!firstRender && _loadedOptions is not null && _loadedOptions.Hotkeys.SetEquals(Options.Hotkeys)) return;
         if (_container is not null)
         {
             _loadedOptions = Options with { Container = _container };
