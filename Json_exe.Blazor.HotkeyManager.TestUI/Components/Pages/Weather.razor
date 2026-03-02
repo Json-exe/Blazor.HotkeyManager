@@ -40,6 +40,7 @@ else
             </table>
         </ChildContent>
     </HotkeyManagerContainer>
+    <button @onclick="RemoveHotkeyOption">Click to remove an option and re-initialize hotkeys!</button>
 }
 
 @code {
@@ -47,8 +48,8 @@ else
 
     private readonly HotkeyManagerOptions _options = new()
     {
-        Hotkeys = new []
-        {
+        Hotkeys =
+        [
             new Hotkey
             {
                 Key = "S",
@@ -61,7 +62,7 @@ else
                 CtrlKey = true,
                 PreventDefault = true
             }
-        }
+        ]
     };
 
     protected override async Task OnInitializedAsync()
@@ -85,6 +86,16 @@ else
         public int TemperatureC { get; set; }
         public string? Summary { get; set; }
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+
+    private void RemoveHotkeyOption()
+    {
+        if (_options.Hotkeys.Count == 0)
+        {
+            return;
+        }
+
+        _options.Hotkeys.Remove(_options.Hotkeys.Last());
     }
 
 }

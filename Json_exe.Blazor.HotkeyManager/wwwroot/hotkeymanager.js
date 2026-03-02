@@ -7,51 +7,127 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-let hotkeyManager;
-let options;
-export function initialized(hotkeyManagerInstance, hotkeyManagerOptions) {
-    hotkeyManager = hotkeyManagerInstance;
-    options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
-    if (options.container === null) {
-        document.addEventListener('keydown', keyDownEvent);
+class DisposeElement extends HTMLElement {
+    constructor() {
+        super(...arguments);
+        this.eventTarget = new EventTarget();
+        this.disposed = false;
+        this.isMoving = false;
     }
-    else {
-        options.container.addEventListener('keydown', keyDownEvent);
+    connectedCallback() {
+        this.isMoving = false;
+        this.style.display = "none";
+        this.style.width = "0";
+        this.style.height = "0";
     }
-}
-export function dispose() {
-    hotkeyManager = null;
-    if (options.container === null) {
-        document.removeEventListener('keydown', keyDownEvent);
-    }
-    else {
-        options.container.removeEventListener('keydown', keyDownEvent);
-    }
-    options = null;
-}
-function keyDownEvent(e) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (options.hotkeys.length <= 0) {
+    disconnectedCallback() {
+        if (this.isMoving)
             return;
+        this.dispose();
+    }
+    connectedMoveCallback() {
+    }
+    addEventListener(type, listener, options) {
+        if (type !== "dispose")
+            throw new DOMException("Element only accepts a dispose event listener.");
+        this.eventTarget.addEventListener(type, listener, options);
+    }
+    removeEventListener(type, listener, options) {
+        this.eventTarget.removeEventListener(type, listener, options);
+    }
+    removeAllDisposeListener() {
+        if (this.disposed)
+            throw new DOMException("Element is already disposed.");
+        this.eventTarget.dispatchEvent(new Event("dispose"));
+        this.eventTarget = new EventTarget();
+    }
+    onDisposed(cb) {
+        if (this.disposed)
+            throw new DOMException("Element is already disposed.");
+        this.addEventListener("dispose", cb);
+        return () => this.removeEventListener("dispose", cb);
+    }
+    dispose() {
+        if (this.disposed)
+            return;
+        this.disposed = true;
+        this.eventTarget.dispatchEvent(new Event("dispose"));
+    }
+}
+DisposeElement.TagName = "dispose-element";
+export class HotkeyManager {
+    constructor(hotkeyManagerInstance, hotkeyManagerOptions) {
+        this.keyDownFunction = this.keyDownEvent.bind(this);
+        this.hotkeyManager = hotkeyManagerInstance;
+        this.initialize(hotkeyManagerOptions);
+    }
+    initialize(hotkeyManagerOptions) {
+        this.tryDefineDisposeElement();
+        this.dispose(false);
+        this.options = new HotkeyManagerOptions(hotkeyManagerOptions.container, hotkeyManagerOptions.hotkeys);
+        if (!this.disposeElement) {
+            this.disposeElement = document.createElement(DisposeElement.TagName);
+            this.disposeElementCleanupFunction = this.disposeElement.onDisposed(() => this.dispose(true));
         }
-        let hotkey = options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase() && h.ctrlKey === e.ctrlKey && h.shiftKey === e.shiftKey);
-        if (hotkey !== undefined) {
-            if (hotkey.preventDefault) {
-                e.preventDefault();
+        if (this.disposeElement.isConnected)
+            this.disposeElement.isMoving = true;
+        if (this.options.container === null) {
+            document.addEventListener('keydown', this.keyDownFunction);
+            document.body.appendChild(this.disposeElement);
+        }
+        else {
+            this.options.container.addEventListener('keydown', this.keyDownFunction);
+            this.options.container.appendChild(this.disposeElement);
+        }
+    }
+    tryDefineDisposeElement() {
+        const customElement = customElements.get(DisposeElement.TagName);
+        if (customElement !== undefined)
+            return;
+        customElements.define(DisposeElement.TagName, DisposeElement);
+    }
+    dispose(disposing) {
+        var _a;
+        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.container) {
+            this.options.container.removeEventListener('keydown', this.keyDownFunction);
+        }
+        else {
+            document.removeEventListener('keydown', this.keyDownFunction);
+        }
+        if (disposing) {
+            this.disposeElementCleanupFunction();
+            this.hotkeyManager = null;
+            this.options = null;
+            this.disposeElement = null;
+        }
+    }
+    keyDownEvent(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.options.hotkeys.length <= 0) {
+                return;
             }
-            const newObj = {
-                ctrlKey: e.ctrlKey,
-                shiftKey: e.shiftKey,
-                key: e.key,
-                code: e.code,
-                altKey: e.altKey,
-                metaKey: e.metaKey,
-                location: e.location,
-                type: e.type
-            };
-            yield hotkeyManager.invokeMethodAsync('OnHotkey', newObj);
-        }
-    });
+            let hotkey = this.options.hotkeys.find(h => h.key.toLowerCase() === e.key.toLowerCase()
+                && h.ctrlKey === e.ctrlKey
+                && h.shiftKey === e.shiftKey
+                && h.altKey === e.altKey);
+            if (hotkey !== undefined) {
+                if (hotkey.preventDefault) {
+                    e.preventDefault();
+                }
+                const newObj = {
+                    ctrlKey: e.ctrlKey,
+                    shiftKey: e.shiftKey,
+                    key: e.key,
+                    code: e.code,
+                    altKey: e.altKey,
+                    metaKey: e.metaKey,
+                    location: e.location,
+                    type: e.type
+                };
+                yield this.hotkeyManager.invokeMethodAsync('OnHotkey', newObj, hotkey.id);
+            }
+        });
+    }
 }
 class HotkeyManagerOptions {
     constructor(container = null, hotkeys = []) {
@@ -60,10 +136,12 @@ class HotkeyManagerOptions {
     }
 }
 class Hotkey {
-    constructor(key, ctrlKey = false, shiftKey = false, preventDefault = false) {
+    constructor(id /* Guid */, key, ctrlKey = false, shiftKey = false, altKey = false, preventDefault = false) {
+        this.id = id;
         this.key = key;
         this.ctrlKey = ctrlKey;
         this.shiftKey = shiftKey;
+        this.altKey = altKey;
         this.preventDefault = preventDefault;
     }
 }

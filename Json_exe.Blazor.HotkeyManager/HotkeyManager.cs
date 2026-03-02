@@ -16,6 +16,8 @@ public sealed class HotkeyManager : IAsyncDisposable
     private IJSObjectReference? _module;
     private readonly IJSRuntime _jsRuntime;
     private readonly DotNetObjectReference<HotkeyManager> _objectReference;
+    private IJSObjectReference? _jsHotkeyManager;
+    private HotkeyManagerOptions? _loadedOptions;
 
     /// <summary>
     /// The event that is triggered when a hotkey is pressed.
@@ -35,28 +37,45 @@ public sealed class HotkeyManager : IAsyncDisposable
     }
 
     /// <summary>
-    /// Initializes the HotkeyManager with the given options.
+    /// Initializes or updates the HotkeyManager with the given options.
     /// </summary>
-    /// <param name="options"></param>
-    public async Task Initialize(HotkeyManagerOptions options)
+    /// <remarks>
+    /// Make sure to call this method inside a lifecycle method that supports JS Interop.
+    /// </remarks>
+    /// <param name="options">
+    /// The options to initialize the HotkeyManager with.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A cancellation token to support cancellation. Defaults to default.
+    /// </param>
+    public async Task Initialize(HotkeyManagerOptions options, CancellationToken cancellationToken = default)
     {
-        if (_module is null)
+        // If we already have a jsHotkeyManager instance, use the initialize method of the class to re-initialize it.
+        if (_jsHotkeyManager is not null)
         {
-            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
-            await _module.InvokeVoidAsync("initialized", _objectReference, options);
+            await _jsHotkeyManager.InvokeVoidAsync("initialize", cancellationToken, options);
+            _loadedOptions = options;
+            return;
         }
+
+        _module ??= await _jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import", cancellationToken, "./_content/Json_exe.Blazor.HotkeyManager/hotkeymanager.js");
+        _jsHotkeyManager =
+            await _module.InvokeConstructorAsync("HotkeyManager", cancellationToken, [_objectReference, options]);
+        _loadedOptions = options;
     }
 
     /// <summary>
     /// Will be called from JavaScript when a hotkey is pressed.
     /// </summary>
-    /// <param name="e"></param>
+    /// <param name="e">The keyboard event args for the hotkey.</param>
+    /// <param name="hotkeyId">The id of the hotkey.</param>
     [JSInvokable]
-    public Task OnHotkey(KeyboardEventArgs e)
+    public async ValueTask OnHotkey(KeyboardEventArgs e, Guid hotkeyId)
     {
         InvokeOnHotkeyPressed(e);
-        return Task.CompletedTask;
+        var task = _loadedOptions?.Hotkeys.FirstOrDefault(h => h.Id == hotkeyId)?.TriggerHotkeyEvent();
+        if (task is not null) await task;
     }
 
     private void InvokeOnHotkeyPressed(KeyboardEventArgs e)
@@ -67,16 +86,26 @@ public sealed class HotkeyManager : IAsyncDisposable
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        if (_module is not null)
+        try
         {
-            try
-            {
-                await _module.InvokeVoidAsync("dispose");
-                await _module.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-            }
+            // TODO: Align this disposal logic with the pattern recommended in the Blazor documentation for
+            // JavaScript interop cleanup. In the official docs, a `<dispose-element>` pattern is shown as an
+            // example of how to associate JS resources with a specific DOM element so they can be released
+            // deterministically when the component is disposed. See, for example:
+            // https://learn.microsoft.com/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-10.0#dom-cleanup-tasks-during-component-disposal
+            // Evaluate whether this HotkeyManager should use a similar element-scoped disposal pattern or an
+            // equivalent mechanism, and update the JS module and this call site accordingly.
+            if (_jsHotkeyManager is not null) await _jsHotkeyManager.DisposeAsync();
+            if (_module is not null) await _module.DisposeAsync();
+            _jsHotkeyManager = null;
+            _module = null;
         }
+        catch (JSDisconnectedException)
+        {
+            // Ignore.
+        }
+
+        _objectReference.Dispose();
+        _loadedOptions = null;
     }
 }
